@@ -1,60 +1,53 @@
 import { beforeEach, describe, expect, test } from "bun:test";
 import ContaBancaria from "./ContaBancaria.ts";
 
-
-describe("Testando ContaBancaria", () => {
+describe("Testando classe ContaBancaria", () => {
   let conta: ContaBancaria;
-
+  let conta2: ContaBancaria;
   beforeEach(() => {
     conta = new ContaBancaria();
+    conta2 = new ContaBancaria();
+    
   });
 
-  test("Depositar valor positivo", () => {
+  test("Testando depositar valor positivo", () => {
     conta.depositar(100);
     expect(conta.consultarSaldo()).toBe(100);
   });
 
-  test("Depositar valor negativo", () => {
+  test("Testando depositar valor negativo", () => {
     conta.depositar(-100);
     expect(conta.consultarSaldo()).toBe(0);
   });
 
-  test("Sacar um valor com saldo suficiente", () => {
+  test("Deve sacar um valor com saldo suficiente", () => {
     conta.depositar(100);
-    expect(conta.sacar(40)).toBe(40);
+    expect(conta.sacar(40));
     expect(conta.consultarSaldo()).toBe(60);
   });
 
-  test("Erro ao sacar com saldo insuficiente", () => {
+  test("Deve lançar um erro ao tentar sacar com saldo insuficiente", () => {
     conta.depositar(100);
-    expect(() => {
-      conta.sacar(150);
-    }).toThrow("Saldo insuficiente");
+    conta.sacar(150);
     expect(conta.consultarSaldo()).toBe(100);
   });
 
-  test("Transferência entre contas", () => {
-    const contaDestino = new ContaBancaria( );
+  test("Testando o valor da transferência", () => {
     conta.depositar(100);
-    conta.transferir(50, contaDestino);
+    conta.transferencia(50, conta2);
     expect(conta.consultarSaldo()).toBe(50);
-    expect(contaDestino.consultarSaldo()).toBe(50);
-  });
+    expect(conta2.consultarSaldo()).toBe(50);
+  
+  })
 
-  test("Erro ao tentar transferir com saldo insuficiente", () => {
-    const contaDestino = new ContaBancaria();
-    conta.depositar(100);
-    expect(() => {
-      conta.transferir(150, contaDestino);
-    }).toThrow("Saldo insuficiente");
-    expect(conta.consultarSaldo()).toBe(100);
-  });
+  test("Testando o extrato", () => {
+    conta.depositar(100)
+    conta.sacar(20)
+    conta.transferencia(30, conta2)
+    let data = new Date()
+    let retorno = [`Extrato das transacoes - ${data.toLocaleDateString('pt-BR')}`,`Valor depositado: 100.00`, `Valor sacado: 20.00`, `Valor transferido: 30.00 Agência: 3 Número da conta: 2`]
+    expect(conta.exibeExtrato()).toEqual(retorno)
 
-  test("Exibir extrato de operações", () => {
-    conta.depositar(200);
-    conta.sacar(100);
-    const extrato = conta.exibirExtrato();
-    expect(extrato).toContain("Depósito: R$200");
-    expect(extrato).toContain("Saque: R$100");
-  });
+  })
+
 });

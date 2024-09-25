@@ -1,55 +1,48 @@
+let data1 = new Date()
 export default class ContaBancaria {
-    private numeroConta: number; //número da conta bancária
-    private agencia: number; // numero da agencia bancária 
-    private saldo: number; // armazena o saldo
-    private extrato: string[]; // histórico das operações realizadas
+    private numeroConta : number = 2
+    private agenciaConta : number = 3
+    private saldoConta = 0
+    private extratoConta : string[] = [`Extrato das transacoes - ${data1.toLocaleDateString('pt-BR')}`]
 
-    public constructor (){ //o this serve para acessar o que está dentro dos private
-        this.numeroConta = Math.floor(Math.random()) 
-        this.agencia = 0;
-        this.saldo = 0;
-        this.extrato = [];
-    }
-    public depositar(valor : number){
-        if (valor > 0) {
-            this.saldo += valor 
-            this.registrarOperacao (`valor depositado é :${ valor}`)
-
-     }
-    }
-     public sacar(valor: number) {
-        if (this.saldo >= valor){
-            this.saldo -= valor;
-            this.registrarOperacao(`Saque: R$${valor}`);
-            return valor;
-        } 
-        throw new Error("Saldo insuficiente");
-     }
-    
-    
-     public transferir(valor: number, contaDestino: ContaBancaria){
-        if (this.saldo >= valor){
-            this.saldo -= valor;
-            contaDestino.depositar(valor);
-            this.registrarOperacao(`Transferencia: R$${valor} para conta ${contaDestino.numeroConta}`);
-        } else {
-            throw new Error("Saldo insuficiente");
+    public depositar(valor: number){
+        if(valor > 0){
+            this.saldoConta += valor
+            this.extratoConta.push(`Valor depositado: ${valor.toFixed(2)}`)  
+        }else{
+            console.log('Valor inválido')
         }
-     }
+    }
 
-     public consultarSaldo() {
-        return this.saldo;
-     }
+    public sacar(valorSaque: number){
+        if(valorSaque <= this.saldoConta && valorSaque > 0){
+            this.saldoConta -= valorSaque
+            this.extratoConta.push(`Valor sacado: ${valorSaque.toFixed(2)}`)
+        }
+        else{
+            console.log("Saque inválido")
+        }
+    }
 
+    public transferencia(valorT: number, contaDestino: ContaBancaria){
+        if(valorT <= this.saldoConta){
+            this.saldoConta -= valorT
+            contaDestino.depositar(valorT)
+            this.extratoConta.push(`Valor transferido: ${valorT.toFixed(2)} Agência: ${this.agenciaConta} Número da conta: ${this.numeroConta}`)
+        }else {
+            console.log("Valor Inválido!")
+        }
+    } 
     
-
-    public exibirExtrato() {
-      return this.extrato.join('\n')
+    public consultarSaldo(){
+        console.log(this.saldoConta)
+        this.extratoConta.push(`Saldo na conta: ${this.saldoConta.toFixed(2)}`)
+        return this.saldoConta
     }
-  
-    private registrarOperacao(descricao: string) {
-      const data = new Date().toISOString();
-      this.extrato.push(`${data} - ${descricao}`);
+    
+    public exibeExtrato(){
+        return this.extratoConta
     }
+    
+    
 }
-  
